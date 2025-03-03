@@ -145,7 +145,7 @@ namespace Programa
 
         static void Main()
         {
-            Evaludor evaluar = new Program("", "", "");
+            Evaludor evaluar = new Program(0, '+', 0);
             var salida = false;
 
             while (salida)
