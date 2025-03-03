@@ -15,13 +15,13 @@ namespace Programa
         static Stack<double> stackNumeros = new();
         static Stack<char> stackOperadores = new();
         static List<Tuple<string, double>> OperacionesGuardadas = new();
-        private string Numero1 { get; set; }
-        private string Numero2 { get; set; }
-        private string Operacion { get; set; }
+        private double Numero1 { get; set; }
+        private double Numero2 { get; set; }
+        private char Operacion { get; set; }
         private static string Expresion { get; set; } = string.Empty;
 
         // Se crear el constuctor de la clase heredada del namespace Operador
-        public Program(string n1, string opr, string n2)
+        public Program(double n1, char opr, double n2)
             : base(n1, opr, n2)
         {
             this.Numero1 = n1;
