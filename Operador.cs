@@ -10,23 +10,23 @@ namespace Operador
         //constructor
         public Evaludor(double n1, char op, double n2)
         {
-            Numero1 = n1;
-            Numero2 = n2;
-            Operacion = op;
+            this.Numero1 = n1;
+            this.Numero2 = n2;
+            this.Operacion = op;
         }
 
-        public double Calcular(List<string> Operaciones)
+        public double Calcular()
         {
-            switch (Operacion)
+            switch (this.Operacion)
             {
                 case '+':
-                    return Numero1 + Numero2;
+                    return this.Numero1 + this.Numero2;
                 case '-':
-                    return Numero1 - Numero2;
+                    return this.Numero1 - this.Numero2;
                 case '*':
-                    return Numero1 * Numero2;
+                    return this.Numero1 * this.Numero2;
                 case '/':
-                    return Numero1 / Numero2;
+                    return this.Numero1 / this.Numero2;
                 default:
                     return 0;
             }

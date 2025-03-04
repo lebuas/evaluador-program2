@@ -1,5 +1,5 @@
 ﻿/*
-Evalutor of expretions, for basic operations
+Evaluator of expretions, for basic operations
 Creator: Leymar Buenaventura Asprilla
 Date: 2025-03-01
 Curse: Progrmation II
@@ -10,24 +10,11 @@ using Operador;
 
 namespace Programa
 {
-    class Program : Evaludor
+    class Program
     {
         static Stack<double> stackNumeros = new();
-        static Stack<char> stackOperadores = new();
         static List<Tuple<string, double>> OperacionesGuardadas = new();
-        private double Numero1 { get; set; }
-        private double Numero2 { get; set; }
-        private char Operacion { get; set; }
         private static string Expresion { get; set; } = string.Empty;
-
-        // Se crear el constuctor de la clase heredada del namespace Operador
-        public Program(double n1, char opr, double n2)
-            : base(n1, opr, n2)
-        {
-            this.Numero1 = n1;
-            this.Numero2 = n2;
-            this.Operacion = opr;
-        }
 
         static void ObterInforacion() // Obtiene la expresion que el usuirio quiere evaluar
         {
@@ -58,7 +45,6 @@ namespace Programa
                 Console.WriteLine("❌ Error: División por cero detectada.");
                 return;
             }
-
             // ✅ Si pasa todas las validaciones, se evaluar la expreison la expresión
             try
             {
@@ -73,15 +59,11 @@ namespace Programa
         static void EvaluarExpresion()
         {
             var resutaldo = 0.0;
-            bool existencia = Expresion.Contains("/") && Expresion.Contains("*");
-            if (existencia)
-            {
-                empilar();
-            }
-            else
-            {
-                resutaldo = desempilar();
-            }
+            empilar();
+            resutaldo = desempilar();
+            Console.WriteLine($"Expresion: {Expresion}");
+            Console.WriteLine($"Resultado: {resutaldo}");
+            Console.WriteLine();
             OperacionesGuardadas.Add(Tuple.Create(Expresion, resutaldo));
         }
 
@@ -117,36 +99,72 @@ namespace Programa
             }
         }
 
+        /*
+        el metodo empliar, recibe la variables Expresion que ingreso el usuario de tipo string
+        en las variables numero1 y numero2 se guardan los numero que se sacan de la cadena
+        numero 1 seguardan los valores antes de encotrar un operaodor y numero2 despues de encontrar el operador
+        si se encuentra un opprador tipo suma o resta el numero 1 se agreaga al stack y se vuelve  a comenzar, para mantenr la prioridad de las operaciones
+         */
+
         static void empilar()
         {
-            double acumulador_numeros = 0.0;
-            foreach (var caracter in Expresion)
+            var numero1 = string.Empty;
+            var numero2 = string.Empty;
+            var operadores = "+-*/";
+
+            for (int x = 0; x < Expresion.Count(); x++)
             {
+                var caracter = Expresion[x];
+                string new_caracter = caracter.ToString();
+
                 if (caracter == '+' || caracter == '-')
                 {
-                    stackOperadores.Push(caracter);
-                    stackNumeros.Push(acumulador_numeros);
-                    acumulador_numeros = 0.0;
+                    var new_numero1 = double.Parse(numero1);
+                    stackNumeros.Push(new_numero1);
+                    numero1 = new_caracter;
+                    numero2 = string.Empty;
                 }
-                if (caracter == '*' || caracter == '/') { }
+                else if (caracter == '*' || caracter == '/')
+                {
+                    var i = x + 1;
+
+                    while (i < Expresion.Count() && !operadores.Contains(Expresion[i]))
+                    {
+                        string new2_caracter = Expresion[i].ToString();
+                        numero2 += new2_caracter;
+                        i++;
+                    }
+                    x = i - 1;
+                    var new_numero1 = double.Parse(numero1);
+                    var new_numero2 = double.Parse(numero2);
+                    Evaludor evaluador = new(new_numero1, caracter, new_numero2);
+                    var resultado = evaluador.Calcular();
+                    numero1 = resultado.ToString();
+                }
                 else
                 {
-                    Convert.ToInt32(caracter);
-                    double double_caracter = (double)caracter;
-                    acumulador_numeros += double_caracter;
+                    numero1 += new_caracter;
                 }
             }
+            double numeroFinal = double.Parse(numero1);
+            stackNumeros.Push(numeroFinal);
         }
 
         static double desempilar()
         {
-            return 0.0;
+            double resultado = 0.0;
+            while (stackNumeros.Count > 0)
+            {
+                var dato = stackNumeros.Pop();
+                resultado += dato;
+            }
+            return resultado;
         }
 
         static void Main()
         {
-            Evaludor evaluar = new Program(0, '+', 0);
-            var salida = false;
+            // Evaludor evaluar = new Program(0, '+', 0);
+            var salida = true;
 
             while (salida)
             {
@@ -155,7 +173,9 @@ namespace Programa
                 Console.WriteLine("2. Mostrar Lista De Expresines.");
                 Console.WriteLine("3. Consultar Expresion.");
                 Console.WriteLine("0. Salir.");
+                Console.Write("Opciones: ");
                 var Opciones = Console.ReadLine();
+                Console.WriteLine();
 
                 switch (Opciones)
                 {
@@ -171,7 +191,8 @@ namespace Programa
                         BuscarExpresion();
                         break;
                     case "0":
-                        salida = true;
+                        Console.WriteLine("Saliendo del programa....");
+                        salida = false;
                         break;
                     default:
                         Console.WriteLine("Opcion Incorrecta");
