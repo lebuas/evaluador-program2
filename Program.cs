@@ -20,7 +20,7 @@ namespace Programa
         {
             Console.Write("Ingrese la expresion: ");
             var expresion = Console.ReadLine();
-            Expresion = expresion?.Trim() ?? "";
+            Expresion = expresion?.Replace(" ", "") ?? "";
         }
 
         static void ValidarExpresion()
@@ -48,11 +48,13 @@ namespace Programa
             // ✅ Si pasa todas las validaciones, se evaluar la expreison la expresión
             try
             {
+                EvaluarExpresion();
                 return;
             }
             catch
             {
                 Console.WriteLine("❌ Error: La expresión es inválida.");
+                return;
             }
         }
 
@@ -72,31 +74,29 @@ namespace Programa
             var contador = 1;
             foreach (var expresion in OperacionesGuardadas)
             {
-                Console.WriteLine($"[{contador}] ", expresion.Item1);
+                Console.WriteLine($"[{contador}] {expresion.Item1}");
                 contador++;
             }
+            Console.WriteLine();
         }
 
         static void BuscarExpresion()
         {
-            Console.WriteLine("Ingrese el numero dela expreson a consultar: ");
+            Console.Write("Ingrese el numero dela expreson a consultar: ");
             var numeroExpresion = Console.ReadLine() ?? "0";
+            int int_numeroExpresion = int.Parse(numeroExpresion) - 1;
+            Console.WriteLine();
 
             try
             {
-                Console.WriteLine(
-                    "Operacion: ",
-                    OperacionesGuardadas[int.Parse(numeroExpresion)].Item1
-                );
-                Console.WriteLine(
-                    "Resultado: ",
-                    OperacionesGuardadas[int.Parse(numeroExpresion)].Item2
-                );
+                Console.WriteLine($"Operación: {OperacionesGuardadas[int_numeroExpresion].Item1}");
+                Console.WriteLine($"Resultado: {OperacionesGuardadas[int_numeroExpresion].Item2}");
             }
             catch
             {
                 Console.WriteLine("Error: El numero ingresado no es valido.");
             }
+            Console.WriteLine();
         }
 
         /*
@@ -173,7 +173,7 @@ namespace Programa
                 Console.WriteLine("2. Mostrar Lista De Expresines.");
                 Console.WriteLine("3. Consultar Expresion.");
                 Console.WriteLine("0. Salir.");
-                Console.Write("Opciones: ");
+                Console.Write("Escribir Opcion: ");
                 var Opciones = Console.ReadLine();
                 Console.WriteLine();
 
@@ -182,7 +182,7 @@ namespace Programa
                     case "1":
                         ObterInforacion();
                         ValidarExpresion();
-                        EvaluarExpresion();
+                        Console.WriteLine();
                         break;
                     case "2":
                         MostrarExpresiones();
@@ -195,7 +195,8 @@ namespace Programa
                         salida = false;
                         break;
                     default:
-                        Console.WriteLine("Opcion Incorrecta");
+                        Console.WriteLine("Opcion Incorrecta........");
+                        Console.WriteLine();
                         break;
                 }
             }
