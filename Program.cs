@@ -1,12 +1,11 @@
 ﻿/*
-Evaluator of expretions, for basic operations
-Creator: Leymar Buenaventura Asprilla
-Date: 2025-03-01
-Curse: Progrmation II
+EVALUDADOR DE EXPRESIONES
+INTEGRANTES: Leymar Buenaventura Asprilla y Luis Carlos Tez
+FECHA: 2025-08-01
+CURSO: Progrmation II
+github: github.com/lebuas/evaluador
 */
-
 using System.Text.RegularExpressions;
-using Operador;
 
 namespace Programa
 {
@@ -15,59 +14,59 @@ namespace Programa
         static Stack<double> stackNumeros = new();
         static List<Tuple<string, double>> OperacionesGuardadas = new();
         private static string Expresion { get; set; } = string.Empty;
+        private static int longExpresion;
 
-        static void ObterInforacion() // Obtiene la expresion que el usuirio quiere evaluar
-        {
-            Console.Write("Ingrese la expresion: ");
-            var expresion = Console.ReadLine();
-            Expresion = expresion?.Replace(" ", "") ?? "";
-        }
-
+        /*
+        Valida la expresión ingresada por el usuario.
+        Verifica caracteres permitidos, operadores seguidos y división por cero.
+        Si la expresión es válida, procede a evaluarla.
+        */
         static void ValidarExpresion()
         {
-            // 1️⃣ Validar caracteres permitidos (solo números, operadores y espacios)
-            if (!Regex.IsMatch(Expresion, @"^[0-9+\-*/().\s]+$"))
-            {
-                Console.WriteLine("❌ Error: La expresión contiene caracteres no permitidos.");
-                return;
-            }
-
-            // 2️⃣ Validar si hay dos operadores seguidos (Ejemplo: 5++3, 4-+2)
-            if (Regex.IsMatch(Expresion, @"[\+\-\*/]{2,}"))
-            {
-                Console.WriteLine("❌ Error: La expresión tiene operadores seguidos.");
-                return;
-            }
-
-            // 3️⃣ Validar división por cero
-            if (Regex.IsMatch(Expresion, @"/\s*0\b"))
-            {
-                Console.WriteLine("❌ Error: División por cero detectada.");
-                return;
-            }
-            // ✅ Si pasa todas las validaciones, se evaluar la expreison la expresión
             try
             {
+                if (!Regex.IsMatch(Expresion, @"^-?[0-9+\-*/().\s]+$"))
+                {
+                    Console.WriteLine("❌ Error: La expresión contiene caracteres no permitidos.");
+                }
+                if (Regex.IsMatch(Expresion, @"[\+\-\*/]{2,}"))
+                {
+                    Console.WriteLine("❌ Error: La expresión tiene operadores seguidos.");
+                    return;
+                }
+                if (Regex.IsMatch(Expresion, @"/\s*0\b"))
+                {
+                    Console.WriteLine("❌ Error: División por cero detectada.");
+                    return;
+                }
+
                 EvaluarExpresion();
                 return;
             }
             catch
             {
-                Console.WriteLine("❌ Error: La expresión es inválida.");
                 return;
             }
         }
 
+        /*
+        Evalúa la expresión matemática.
+        Usa los métodos Empilar() y Desempilar() para calcular el resultado.
+        Muestra el resultado y guarda la expresión con su resultado en la lista.
+        */
         static void EvaluarExpresion()
         {
             var resutaldo = 0.0;
             empilar();
             resutaldo = desempilar();
             Console.WriteLine($"Expresion: {Expresion}");
-            Console.WriteLine($"Resultado: {resutaldo}");
-            Console.WriteLine();
+            Console.WriteLine($"Resultado: {resutaldo}\n");
+
             OperacionesGuardadas.Add(Tuple.Create(Expresion, resutaldo));
         }
+
+        /// Muestra todas las expresiones guardadas en la lista OperacionesGuardadas.
+        /// Cada expresión se muestra con un número de índice.
 
         static void MostrarExpresiones()
         {
@@ -80,47 +79,65 @@ namespace Programa
             Console.WriteLine();
         }
 
+        /// Busca una expresión en la lista OperacionesGuardadas usando un índice.
+        /// El índice debe estar entre corchetes (ejemplo: [1]).
+        /// Muestra la expresión y su resultado si existe; de lo contrario, muestra un error.
+
         static void BuscarExpresion()
         {
-            Console.Write("Ingrese el numero dela expreson a consultar: ");
-            var numeroExpresion = Console.ReadLine() ?? "0";
-            int int_numeroExpresion = int.Parse(numeroExpresion) - 1;
-            Console.WriteLine();
-
             try
             {
+                var nuemeroExpresion = Expresion.Substring(1, (Expresion.Length - 2));
+                int int_numeroExpresion = int.Parse(nuemeroExpresion) - 1;
                 Console.WriteLine($"Operación: {OperacionesGuardadas[int_numeroExpresion].Item1}");
                 Console.WriteLine($"Resultado: {OperacionesGuardadas[int_numeroExpresion].Item2}");
             }
             catch
             {
-                Console.WriteLine("Error: El numero ingresado no es valido.");
+                Console.WriteLine("ERROR: POSICIÓN DE MEMORIA NO TIENE EXPRESIÓN.\n");
             }
-            Console.WriteLine();
         }
 
         /*
-        el metodo empliar, recibe la variables Expresion que ingreso el usuario de tipo string
-        en las variables numero1 y numero2 se guardan los numero que se sacan de la cadena
-        numero 1 seguardan los valores antes de encotrar un operaodor y numero2 despues de encontrar el operador
-        si se encuentra un opprador tipo suma o resta el numero 1 se agreaga al stack y se vuelve  a comenzar, para mantenr la prioridad de las operaciones
-         */
+           Este método convierte la expresion en pila de numeros y procesa las operaiociones de mayor gerarquía, dejando en la pila solo numeros que se suman o se restan
+           Funcionamiento:
+           -Se recore la exprsion y deacuerdo al aracter se toma una decicion:
+           1. Si encuentra un operador de suma o resta (+ o -), lo agrega a la variable numero1.
+           2. Si encuentra un operador de multiplicacion o división (/ o *), se agrega a la variable numero2.
+           3. Si encuentra un caracter que no sea un operador de suma o resta, se agrega a la variable numero1.
+           4. Si encuentra un operador de suma o resta, se suma numero1 y numero2 y se agrega el resultado a la variable numero1.
+           5. Si encuentra un operador de multiplicacion o división, se multiplica numero1 y numero2 y se agrega el resultado a la variable numero1.
+           6. Si encuentra un caracter que no sea un operador de suma o resta, se agrega a la variable numero2.
+           7. Si encuentra un operador de suma o resta, se suma numero1 y numero2 y se agrega el resultado a la variable numero1.
+           8. Si encuentra un operador de multiplicacion o división, se multiplica numero1 y numero2 y se agrega el resultado a la variable numero1.
+           9. Si encuentra un caracter que no sea un operador de suma o resta, se agrega a la variable numero1.
 
+        */
         static void empilar()
         {
             var numero1 = string.Empty;
             var numero2 = string.Empty;
             var operadores = "+-*/";
+            double resultado = 0;
 
-            for (int x = 0; x < Expresion.Count(); x++)
+            for (int x = 0; x < Expresion.Length; x++)
             {
                 var caracter = Expresion[x];
                 string new_caracter = caracter.ToString();
 
+                if (caracter == '-' && (x == 0 || operadores.Contains(Expresion[x - 1].ToString())))
+                {
+                    numero1 += new_caracter;
+                    continue;
+                }
+
                 if (caracter == '+' || caracter == '-')
                 {
-                    var new_numero1 = double.Parse(numero1);
-                    stackNumeros.Push(new_numero1);
+                    if (!string.IsNullOrEmpty(numero1))
+                    {
+                        var new_numero1 = double.Parse(numero1);
+                        stackNumeros.Push(new_numero1);
+                    }
                     numero1 = new_caracter;
                     numero2 = string.Empty;
                 }
@@ -128,17 +145,24 @@ namespace Programa
                 {
                     var i = x + 1;
 
-                    while (i < Expresion.Count() && !operadores.Contains(Expresion[i]))
+                    while (i < Expresion.Length && !operadores.Contains(Expresion[i]))
                     {
                         string new2_caracter = Expresion[i].ToString();
                         numero2 += new2_caracter;
                         i++;
                     }
                     x = i - 1;
-                    var new_numero1 = double.Parse(numero1);
-                    var new_numero2 = double.Parse(numero2);
-                    Evaludor evaluador = new(new_numero1, caracter, new_numero2);
-                    var resultado = evaluador.Calcular();
+
+                    switch (caracter)
+                    {
+                        case '/':
+                            resultado = double.Parse(numero1) / double.Parse(numero2);
+                            break;
+                        case '*':
+                            resultado = double.Parse(numero1) * double.Parse(numero2);
+                            break;
+                    }
+
                     numero1 = resultado.ToString();
                 }
                 else
@@ -146,9 +170,16 @@ namespace Programa
                     numero1 += new_caracter;
                 }
             }
-            double numeroFinal = double.Parse(numero1);
-            stackNumeros.Push(numeroFinal);
+
+            if (!string.IsNullOrEmpty(numero1))
+            {
+                double numeroFinal = double.Parse(numero1);
+                stackNumeros.Push(numeroFinal);
+            }
         }
+
+        /// Desempila los números de la pila stackNumeros y los suma.
+        /// Retorna el resultado final de la expresión.
 
         static double desempilar()
         {
@@ -161,43 +192,49 @@ namespace Programa
             return resultado;
         }
 
+        /*
+         Método principal del programa.
+        Muestra un menú interactivo para ingresar expresiones, ver la memoria o salir.
+        */
         static void Main()
         {
-            // Evaludor evaluar = new Program(0, '+', 0);
             var salida = true;
+            Console.WriteLine("Bienvenido al Evaluador de Expresiones.");
+            Console.WriteLine("Creado por Leymar Buenaventura Asprilla y Luis Carlos Tez.\n");
 
             while (salida)
             {
-                Console.WriteLine("Opciones: ");
-                Console.WriteLine("1. Evaluar Una Expresion.");
-                Console.WriteLine("2. Mostrar Lista De Expresines.");
-                Console.WriteLine("3. Consultar Expresion.");
-                Console.WriteLine("0. Salir.");
-                Console.Write("Escribir Opcion: ");
-                var Opciones = Console.ReadLine();
-                Console.WriteLine();
+                Console.Write("Ingrese Expresion:-> ");
+                var datos = Console.ReadLine();
+                Expresion = datos?.Replace(" ", "").ToLower() ?? "";
+                longExpresion = Expresion.Length;
 
-                switch (Opciones)
                 {
-                    case "1":
-                        ObterInforacion();
-                        ValidarExpresion();
-                        Console.WriteLine();
-                        break;
-                    case "2":
+                    if (Expresion == "memoria" || Expresion == "m")
+                    {
                         MostrarExpresiones();
-                        break;
-                    case "3":
-                        BuscarExpresion();
-                        break;
-                    case "0":
-                        Console.WriteLine("Saliendo del programa....");
+                    }
+                    else if (Expresion == "salir" || Expresion == "s")
+                    {
                         salida = false;
-                        break;
-                    default:
-                        Console.WriteLine("Opcion Incorrecta........");
+                        Console.WriteLine("Saliendo del programa........");
                         Console.WriteLine();
-                        break;
+                    }
+                    else if (Expresion.Any(c => c == '+' || c == '-' || c == '*' || c == '/'))
+                    {
+                        ValidarExpresion();
+                    }
+                    else if (
+                        (Expresion.StartsWith("[") && Expresion.EndsWith("]"))
+                        && longExpresion > 2
+                    )
+                    {
+                        BuscarExpresion();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Expresion invalida. Reintente nuevamente.\n");
+                    }
                 }
             }
         }
