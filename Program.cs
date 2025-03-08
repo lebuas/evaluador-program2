@@ -27,16 +27,16 @@ namespace Programa
             {
                 if (!Regex.IsMatch(Expresion, @"^-?[0-9+\-*/().\s]+$"))
                 {
-                    Console.WriteLine("❌ Error: La expresión contiene caracteres no permitidos.");
+                    Console.WriteLine("Error: La expresión contiene caracteres no permitidos.");
                 }
                 if (Regex.IsMatch(Expresion, @"[\+\-\*/]{2,}"))
                 {
-                    Console.WriteLine("❌ Error: La expresión tiene operadores seguidos.");
+                    Console.WriteLine("Error: La expresión tiene operadores seguidos.");
                     return;
                 }
                 if (Regex.IsMatch(Expresion, @"/\s*0\b"))
                 {
-                    Console.WriteLine("❌ Error: División por cero detectada.");
+                    Console.WriteLine("Error: División por cero detectada.");
                     return;
                 }
 
