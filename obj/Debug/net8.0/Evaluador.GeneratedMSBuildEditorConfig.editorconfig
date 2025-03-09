@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Evaluador
-build_property.ProjectDir = /home/leymar/Proyectos/csharp/Evaluador/
+build_property.ProjectDir = /home/leymar/Proyectos/csharp/EvaluadorLinux/
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 

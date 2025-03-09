@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/leymar/Proyectos/csharp/Evaluador/Evaluador.csproj": {}
+    "/home/leymar/Proyectos/csharp/EvaluadorLinux/Evaluador.csproj": {}
   },
   "projects": {
-    "/home/leymar/Proyectos/csharp/Evaluador/Evaluador.csproj": {
+    "/home/leymar/Proyectos/csharp/EvaluadorLinux/Evaluador.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/leymar/Proyectos/csharp/Evaluador/Evaluador.csproj",
+        "projectUniqueName": "/home/leymar/Proyectos/csharp/EvaluadorLinux/Evaluador.csproj",
         "projectName": "Evaluador",
-        "projectPath": "/home/leymar/Proyectos/csharp/Evaluador/Evaluador.csproj",
+        "projectPath": "/home/leymar/Proyectos/csharp/EvaluadorLinux/Evaluador.csproj",
         "packagesPath": "/home/leymar/.nuget/packages/",
-        "outputPath": "/home/leymar/Proyectos/csharp/Evaluador/obj/",
+        "outputPath": "/home/leymar/Proyectos/csharp/EvaluadorLinux/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/leymar/.nuget/NuGet/NuGet.Config"

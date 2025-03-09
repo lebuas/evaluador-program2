@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8nFxNgRYA7oVgGG9eFH7Pkb8VjTIVawyaP4HQQ7EyRw6sMCT+Bcp8sXocpo969ienIwCyDcK/0zJh+fx9OhyOQ==",
+  "dgSpecHash": "mCJHWhj1/iHk1ei3F4R4N7nm0GFy/Ic2IUnlo+0ob918SH9Ia+56TCTdO/+g8qKDpVUeBzuSgLVDqE8ZPhqV7g==",
   "success": true,
-  "projectFilePath": "/home/leymar/Proyectos/csharp/Evaluador/Evaluador.csproj",
+  "projectFilePath": "/home/leymar/Proyectos/csharp/EvaluadorLinux/Evaluador.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
