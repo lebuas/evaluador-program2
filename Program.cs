@@ -5,6 +5,9 @@ FECHA: 2025-08-01
 CURSO: Progrmation II
 github: github.com/lebuas/evaluador
 */
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Programa
@@ -17,7 +20,7 @@ namespace Programa
         private static int longExpresion;
 
         /*
-        Valida la expresión ingresada por el usuario.
+        Valida la expresión ingresada por el usuario utilizando expresiones regulares.
         Verifica caracteres permitidos, operadores seguidos y división por cero.
         Si la expresión es válida, procede a evaluarla.
         */
@@ -25,18 +28,22 @@ namespace Programa
         {
             try
             {
+                // Validar si la expresión es válida o contiene caracteres no permitidos
                 if (!Regex.IsMatch(Expresion, @"^-?[0-9+\-*/().\s]+$"))
                 {
-                    Console.WriteLine("Error: La expresión contiene caracteres no permitidos.");
-                }
-                if (Regex.IsMatch(Expresion, @"[\+\-\*/]{2,}"))
-                {
-                    Console.WriteLine("Error: La expresión tiene operadores seguidos.");
+                    Console.WriteLine("Error: La expresión contiene caracteres no permitidos.\n");
                     return;
                 }
-                if (Regex.IsMatch(Expresion, @"/\s*0\b"))
+                // Validar si hay operadores seguidos
+                if (Regex.IsMatch(Expresion, @"[\+\-\*/]{2,}"))
                 {
-                    Console.WriteLine("Error: División por cero detectada.");
+                    Console.WriteLine("Error: La expresión tiene operadores seguidos.\n");
+                    return;
+                }
+                // Validar si hay divisiones por cero
+                if (Regex.IsMatch(Expresion, @"\/(0(?!\.\d*[1-9])|0\.0+$)"))
+                {
+                    Console.WriteLine("Error: División por cero detectada.\n");
                     return;
                 }
 
@@ -56,13 +63,13 @@ namespace Programa
         */
         static void EvaluarExpresion()
         {
-            var resutaldo = 0.0;
-            empilar();
-            resutaldo = desempilar();
+            var resultado = 0.0;
+            Empilar();
+            resultado = Desempilar();
             Console.WriteLine($"Expresion: {Expresion}");
-            Console.WriteLine($"Resultado: {resutaldo}\n");
+            Console.WriteLine($"Resultado: {resultado}\n");
 
-            OperacionesGuardadas.Add(Tuple.Create(Expresion, resutaldo));
+            OperacionesGuardadas.Add(Tuple.Create(Expresion, resultado));
         }
 
         /// Muestra todas las expresiones guardadas en la lista OperacionesGuardadas.
@@ -90,7 +97,9 @@ namespace Programa
                 var nuemeroExpresion = Expresion.Substring(1, (Expresion.Length - 2));
                 int int_numeroExpresion = int.Parse(nuemeroExpresion) - 1;
                 Console.WriteLine($"Operación: {OperacionesGuardadas[int_numeroExpresion].Item1}");
-                Console.WriteLine($"Resultado: {OperacionesGuardadas[int_numeroExpresion].Item2}");
+                Console.WriteLine(
+                    $"Resultado: {OperacionesGuardadas[int_numeroExpresion].Item2}\n"
+                );
             }
             catch
             {
@@ -99,21 +108,18 @@ namespace Programa
         }
 
         /*
-           Este método convierte la expresion en pila de numeros y procesa las operaiociones de mayor gerarquía, dejando en la pila solo numeros que se suman o se restan
-           Funcionamiento:
-           -Se recore la exprsion y deacuerdo al aracter se toma una decicion:
-           1. Si encuentra un operador de suma o resta (+ o -), lo agrega a la variable numero1.
-           2. Si encuentra un operador de multiplicacion o división (/ o *), se agrega a la variable numero2.
-           3. Si encuentra un caracter que no sea un operador de suma o resta, se agrega a la variable numero1.
-           4. Si encuentra un operador de suma o resta, se suma numero1 y numero2 y se agrega el resultado a la variable numero1.
-           5. Si encuentra un operador de multiplicacion o división, se multiplica numero1 y numero2 y se agrega el resultado a la variable numero1.
-           6. Si encuentra un caracter que no sea un operador de suma o resta, se agrega a la variable numero2.
-           7. Si encuentra un operador de suma o resta, se suma numero1 y numero2 y se agrega el resultado a la variable numero1.
-           8. Si encuentra un operador de multiplicacion o división, se multiplica numero1 y numero2 y se agrega el resultado a la variable numero1.
-           9. Si encuentra un caracter que no sea un operador de suma o resta, se agrega a la variable numero1.
-
+            Este método convierte la expresión en una pila de números y procesa operaciones de mayor jerarquía (multiplicación o división).
+            - Recorre la expresión carácter por carácter y concatena en la variable `numero1` los caracteres que no sean operadores (/ o *).
+            - Si encuentra un operador de suma o resta (+ o -), agrega el número que se iba almacenando en `numero1` a la pila,
+              lo convierte a `double` y lo resetea a una cadena vacía y le asigna el operador actual al nuevo numero que se va a llenar.
+            - Si encuentra un operador de multiplicación o división (* o /), recorre la expresión desde la posición actual +1
+              hasta encontrar otro operador, almacenando el segundo número en `numero2`.
+            - En cuanto se encuentra el operador, se procesa la multiplicación o división inmediatamente y el resultado se almacena en `numero1`.
+            - Al finalizar el recorrido, el último número (si existe) se agrega a la pila.
         */
-        static void empilar()
+
+
+        static void Empilar()
         {
             var numero1 = string.Empty;
             var numero2 = string.Empty;
@@ -125,63 +131,67 @@ namespace Programa
                 var caracter = Expresion[x];
                 string new_caracter = caracter.ToString();
 
+                // Maneja números negativos al inicio o después de un operador
                 if (caracter == '-' && (x == 0 || operadores.Contains(Expresion[x - 1].ToString())))
                 {
                     numero1 += new_caracter;
                     continue;
                 }
-
-                if (caracter == '+' || caracter == '-')
+                // Si encuentra un operador de suma o resta (+ o -), guarda el número en la pila
+                else if (caracter == '+' || caracter == '-')
                 {
-                    if (!string.IsNullOrEmpty(numero1))
-                    {
-                        var new_numero1 = double.Parse(numero1);
-                        stackNumeros.Push(new_numero1);
-                    }
-                    numero1 = new_caracter;
+                    stackNumeros.Push(
+                        double.Parse(numero1, System.Globalization.CultureInfo.InvariantCulture)
+                    );
+                    numero1 = new_caracter; // Se reinicia para capturar el nuevo número
                     numero2 = string.Empty;
                 }
+                // Si encuentra un operador de multiplicación o división (* o /)
                 else if (caracter == '*' || caracter == '/')
                 {
-                    var i = x + 1;
+                    int i = x + 1;
+                    numero2 = string.Empty;
 
+                    // Capturar el segundo número hasta encontrar otro operador
                     while (i < Expresion.Length && !operadores.Contains(Expresion[i]))
                     {
-                        string new2_caracter = Expresion[i].ToString();
-                        numero2 += new2_caracter;
+                        numero2 += Expresion[i].ToString();
                         i++;
                     }
-                    x = i - 1;
+                    x = i - 1; // Ajustar índice
 
-                    switch (caracter)
-                    {
-                        case '/':
-                            resultado = double.Parse(numero1) / double.Parse(numero2);
-                            break;
-                        case '*':
-                            resultado = double.Parse(numero1) * double.Parse(numero2);
-                            break;
-                    }
+                    // Convertir los números y realizar la operación inmediatamente
+                    double num1 = double.Parse(
+                        numero1,
+                        System.Globalization.CultureInfo.InvariantCulture
+                    );
+                    double num2 = double.Parse(
+                        numero2,
+                        System.Globalization.CultureInfo.InvariantCulture
+                    );
 
-                    numero1 = resultado.ToString();
+                    resultado = (caracter == '*') ? num1 * num2 : num1 / num2;
+
+                    // Guardar el resultado en numero1 para seguir procesando
+                    numero1 = resultado.ToString(System.Globalization.CultureInfo.InvariantCulture);
                 }
                 else
                 {
-                    numero1 += new_caracter;
+                    numero1 += new_caracter; // Acumular número
                 }
             }
 
+            // Guardar el último número en la pila si existe
             if (!string.IsNullOrEmpty(numero1))
             {
-                double numeroFinal = double.Parse(numero1);
-                stackNumeros.Push(numeroFinal);
+                stackNumeros.Push(
+                    double.Parse(numero1, System.Globalization.CultureInfo.InvariantCulture)
+                );
             }
         }
 
-        /// Desempila los números de la pila stackNumeros y los suma.
-        /// Retorna el resultado final de la expresión.
-
-        static double desempilar()
+        /// Desempila los números empilador, y mientras desempila, los va sumando, para obtener el resultado final de la expresión.
+        static double Desempilar()
         {
             double resultado = 0.0;
             while (stackNumeros.Count > 0)
@@ -193,8 +203,9 @@ namespace Programa
         }
 
         /*
-         Método principal del programa.
-        Muestra un menú interactivo para ingresar expresiones, ver la memoria o salir.
+        Método principal del programa.
+        - Muestra un menú interactivo.
+        - Permite ingresar expresiones, ver la memoria o salir.
         */
         static void Main()
         {
